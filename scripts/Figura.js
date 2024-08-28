@@ -1,0 +1,33 @@
+// Selecciona el canvas y su contexto
+const canvas = document.getElementById('miCanvas');
+const ctx = canvas.getContext('2d');
+
+// Define la clase base para las figuras
+class Figura {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.seleccionada = false;
+    }
+
+    // Método base para verificar si un punto está dentro de la figura
+    contienePunto(x, y) {
+        return false;
+    }
+    ajustarPosicionFigura(figura) {
+        // Ajustar posición en X
+        if (figura.x > canvas.width) {
+            figura.x = 0;
+        } else if (figura.x + (figura.ancho || figura.radio) < 0) {
+            figura.x = canvas.width;
+        }
+        // Ajustar posición en Y
+        if (figura.y > canvas.height) {
+            figura.y = 0;
+        } else if (figura.y + (figura.alto || figura.radio) < 0) {
+            figura.y = canvas.height;
+        }
+    }
+    // Método base para dibujar la figura (se implementará en las subclases)
+    dibujar(ctx) {}
+}

@@ -1,0 +1,29 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-image: url('images/fondo-lineas-dinamicas-estilo-papel_23-2149008629.avif');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+canvas {
+    border: 1px solid black;
+    background-color: #1a2222a8;
+    border-radius: 10%;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);
+}
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#mensaje{
+    color: white;
+}
+h1{
+    color: white;
+}
