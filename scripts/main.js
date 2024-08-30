@@ -1,12 +1,38 @@
 let figuras = [];
-const colores = ['red', 'green', 'blue', 'orange', 'purple', 'cyan'];
 const mensajeElemento = document.getElementById('mensaje');
 const cantFiguras = 5;
 let delay = 100;
+
+let coloresCirculos = []; // Array para almacenar colores de los círculos
+let coloresComplementariosUsados = new Set(); // Set para almacenar colores complementarios usados para los cuadrados
+
+function crearFigurasIniciales() {
+    // Crear todos los círculos primero
+    for (let i = 0; i < cantFiguras; i++) {
+        agregarFigura(0); // Índice 0 para círculos
+    }
+
+    // Crear todos los cuadrados después de que se hayan creado todos los círculos
+    for (let i = 0; i < cantFiguras; i++) {
+        agregarFigura(1); // Índice 1 para cuadrados
+    }
+
+    // Crear todos los rectángulos después
+    for (let i = 0; i < cantFiguras; i++) {
+        agregarFigura(2); // Índice 2 para rectángulos
+    }
+
+    // Finalmente, dibujar todas las figuras
+    dibujarFiguras();
+}
+
 const crearFiguraFuncs = [
+    // Función para crear círculos
     () => {
         let radio = Math.random() * 40 + 25; // Definir radio aleatorio
-        let color = generarColorAleatorio(); // Color aleatorio en formato rgba
+        let color = generarColorAleatorio(); // Generar un color aleatorio
+        coloresCirculos.push(color); // Guardar color del círculo
+        console.log(`Círculo - Color: ${color}`);
         return new Circulo(
             Math.random() * (canvas.width - radio * 2) + radio,
             Math.random() * (canvas.height - radio * 2) + radio,
@@ -16,21 +42,34 @@ const crearFiguraFuncs = [
             false
         );
     },
+    // Función para crear cuadrados
     () => {
         let lado = Math.random() * 40 + 25; // Definir lado aleatorio
-        let color = generarColorAleatorio(); // Color aleatorio en formato rgba
+
+        // Calcular un color complementario a todos los colores de los círculos
+        let colorComplementarioCuadrado;
+        do {
+            const colorCirculoSeleccionado = coloresCirculos[Math.floor(Math.random() * coloresCirculos.length)];
+            colorComplementarioCuadrado = colorComplementario(colorCirculoSeleccionado);
+        } while (coloresComplementariosUsados.has(colorComplementarioCuadrado)); // Repetir si ya se usó este color complementario
+
+        coloresComplementariosUsados.add(colorComplementarioCuadrado); // Marcar el color como usado
+        console.log(`Cuadrado - Color complementario: ${colorComplementarioCuadrado}`);
+        
         return new Cuadrado(
             Math.random() * (canvas.width - lado),
             Math.random() * (canvas.height - lado),
             lado,
-            colorComplementario(color), // Color complementario
+            colorComplementarioCuadrado,
             ctx,
             false
         );
     },
+    // Función para crear rectángulos
     () => {
         let lado = Math.random() * 40 + 25; // Definir lado aleatorio
-        let color = generarColorAleatorio(); // Color aleatorio en formato rgba
+        // Asignar color blanco o negro aleatoriamente
+        let color = Math.random() < 0.5 ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)';
         return new Rectangulo(
             Math.random() * (canvas.width - lado),
             Math.random() * (canvas.height - lado),
@@ -42,17 +81,17 @@ const crearFiguraFuncs = [
         );
     },
 ];
+
+
 function generarColorAleatorio() {
     let r = Math.floor(Math.random() * 256);
     let g = Math.floor(Math.random() * 256);
     let b = Math.floor(Math.random() * 256);
-    /* let a = Math.floor(Math.random() * 30) + 246; // Transparencia aleatoria entre 200 y 255 */
     return `rgba(${r},${g},${b},1)`;
 }
 
 // Función para generar un color complementario en formato rgba
 function colorComplementario(color) {
-    // Extraer los valores de red, verde, azul y alfa del string rgba
     const regex = /rgba?\((\d+),\s*(\d+),\s*(\d+),?\s*([.\d]*)\)/;
     const matches = regex.exec(color);
     if (!matches) return 'rgba(0, 0, 0, 1)'; // Valor por defecto si no hay match
@@ -65,67 +104,27 @@ function colorComplementario(color) {
     return `rgba(${r},${g},${b},${a})`;
 }
 
-
-let figuraIndex = 0;
-main();
-function main() {
-    crearFiguras();
-}
-
-// Generar figuras al azar
-function agregarFigura() {
+// Función para agregar figuras al array de figuras
+function agregarFigura(figuraIndex) {
     const crearFigura = crearFiguraFuncs[figuraIndex];
     const nuevaFigura = crearFigura();
-    figuras.push(nuevaFigura);
-    // Actualizar el índice para la siguiente figura
-    figuraIndex = (figuraIndex + 1) % crearFiguraFuncs.length;
-}
-
-
-// Dibujar todas las figuras
-function crearFiguras() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpia el canvas
-    if (figuras.length < cantFiguras * crearFiguraFuncs.length) {
-        agregarFigura();
-        delay = Math.max(40, delay - 5);
-        setTimeout(crearFiguras, delay);
+    if (nuevaFigura) {  // Verificar que la figura se haya creado correctamente
+        figuras.push(nuevaFigura);
     }
-
-    // Dibuja todas las figuras
-    figuras.forEach(figura => figura.dibujar(ctx));
-    /*     ctx.clearRect(0, 0, canvas.width, canvas.height);
-        figuras.forEach(figura => {
-            if (figura.seleccionada) {
-                // Aumenta el tamaño de la figura en un 1% cuando está seleccionada
-                ctx.save(); // Guarda el estado actual del contexto
-    
-                // Aumentar el tamaño de la figura temporalmente
-                ctx.translate(figura.x, figura.y); // Mueve el contexto al centro de la figura
-                ctx.scale(1.15, 1.15); // Escala la figura al 101%
-                ctx.translate(-figura.x, -figura.y); // Mueve el contexto de vuelta
-                delay = Math.max(10, delay - 10);
-                setTimeout(() => { figura.dibujar(ctx); }, delay);
-    
-                // Dibuja el borde de selección
-                ctx.strokeStyle = 'white';
-                ctx.lineWidth = 3;
-                if (figura instanceof Circulo) {
-                    ctx.beginPath();
-                    ctx.arc(figura.x, figura.y, figura.radio, 0, Math.PI * 2);
-                    ctx.stroke();
-                } else if (figura instanceof Rectangulo || figura instanceof Cuadrado) {
-                    ctx.strokeRect(figura.x, figura.y, figura.ancho, figura.alto);
-                }
-    
-                ctx.restore(); // Restaura el estado original del contexto
-            } else {
-                delay = Math.max(10, delay - 10);
-                setTimeout(() => { figura.dibujar(ctx); }, delay);
-    
-            }
-        }); */
 }
 
+// Función para dibujar todas las figuras
+function dibujarFiguras() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpia el canvas
+    figuras.forEach(figura => figura.dibujar(ctx));
+}
+
+// Función principal para iniciar la creación de figuras
+function main() {
+    crearFigurasIniciales();
+}
+
+main();
 
 
 
@@ -159,7 +158,7 @@ canvas.addEventListener('click', (event) => {
         figuraSeleccionada = null;
     }
 
-    crearFiguras();
+    dibujarFiguras();
 });
 
 
@@ -205,7 +204,7 @@ canvas.addEventListener('mousemove', (event) => {
     figuraSeleccionada.x = x - offsetX;
     figuraSeleccionada.y = y - offsetY;
     figuraSeleccionada.ajustarPosicionFigura(figuraSeleccionada);
-    crearFiguras();
+    dibujarFiguras();
 });
 
 // Evento de mouseup para soltar la figura
@@ -234,5 +233,5 @@ document.addEventListener('keydown', (event) => {
             break;
     }
     figuraSeleccionada.ajustarPosicionFigura(figuraSeleccionada);
-    crearFiguras();
+    dibujarFiguras();
 });
