@@ -23,9 +23,11 @@ canvas {
 }
 #mensaje{
     color: white;
+    font-family: monospace;
 }
 h1{
     color: white;
+    font-family: monospace;
 }
 #regenerarFiguras {
     background-color: #122c66;
