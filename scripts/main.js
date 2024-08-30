@@ -71,16 +71,12 @@ const crearFiguraFuncs = [
     },
     () => {
         const lado = Math.random() * 40 + 25;
-        const color = Math.random() < 0.5 ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 1)';
-        return new Rectangulo(
-            Math.random() * (canvas.width - lado),
-            Math.random() * (canvas.height - lado),
-            lado * 2,
-            lado,
-            color,
-            ctx,
-            false
-        );
+        const x = Math.random() * (canvas.width - lado);
+        const y = Math.random() * (canvas.height - lado);
+        const width = lado * 2;  // Asegúrate de definir width correctamente
+        const height = lado;     // Asegúrate de definir height correctamente
+
+        return new Rectangulo(x, y, width, height, null, ctx, false);
     }
 ];
 
