@@ -13,7 +13,7 @@ canvas {
     border: 1px solid black;
     background-color: #1a2222a8;
     border-radius: 10%;
-    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 5px 5px 15px rgb(255 255 255 / 50%);
 }
 .container{
     display: flex;
@@ -27,3 +27,23 @@ canvas {
 h1{
     color: white;
 }
+#regenerarFiguras {
+    background-color: #122c66;
+    color: white;
+    padding: 2%;
+    margin: 3%;
+    font-family: monospace;
+    font-size: larger;
+    border-radius: 10px;
+    box-shadow: 5px 5px 15px rgb(0 0 0);
+    transition: background-color 1s cubic-bezier(0.42, 0, 0.58, 1), color 0.5s cubic-bezier(0.42, 0, 0.58, 1);
+}
+#regenerarFiguras:hover{
+    background-color: #322e4b;
+    box-shadow: 5px 5px 15px rgb(28, 31, 89);
+    cursor: pointer;
+    width:200px;
+    height: 60px;
+    font-size: large;
+}
+

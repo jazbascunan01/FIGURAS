@@ -3,6 +3,7 @@
 const canvas = document.getElementById('miCanvas');
 const ctx = canvas.getContext('2d');
 const mensajeElemento = document.getElementById('mensaje');
+const regenerarBtn = document.getElementById('regenerarFiguras');
 const cantFiguras = 5;
 const delayIncrement = 200; // Tiempo de retraso entre dibujos
 
@@ -112,6 +113,7 @@ function configurarEventos() {
     canvas.addEventListener('mousemove', handleCanvasMouseMove);
     canvas.addEventListener('mouseup', handleCanvasMouseUp);
     document.addEventListener('keydown', handleDocumentKeyDown);
+    regenerarBtn.addEventListener('click', regenerarFiguras);
 }
 
 function handleCanvasClick(event) {
@@ -214,6 +216,13 @@ function moverFiguraConTeclado(key) {
 function deseleccionarFiguras() {
     figuras.forEach(figura => figura.seleccionada = false);
 }
+function regenerarFiguras() {
+    figuras = []; // Limpiar figuras existentes
+    coloresCirculos = []; // Limpiar colores de círculos
+    coloresComplementariosUsados = new Set(); // Limpiar colores complementarios usados
+    crearFigurasIniciales(); // Crear nuevas figuras
+}
+
 
 // Función Principal
 function main() {
