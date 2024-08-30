@@ -6,7 +6,7 @@ let delay = 100;
 const crearFiguraFuncs = [
     () => {
         let radio = Math.random() * 40 + 25; // Definir radio aleatorio
-        let color = colores[Math.floor(Math.random() * colores.length)]; // Color aleatorio
+        let color = generarColorAleatorio(); // Color aleatorio en formato rgba
         return new Circulo(
             Math.random() * (canvas.width - radio * 2) + radio,
             Math.random() * (canvas.height - radio * 2) + radio,
@@ -18,19 +18,19 @@ const crearFiguraFuncs = [
     },
     () => {
         let lado = Math.random() * 40 + 25; // Definir lado aleatorio
-        let color = colores[Math.floor(Math.random() * colores.length)]; // Color aleatorio
+        let color = generarColorAleatorio(); // Color aleatorio en formato rgba
         return new Cuadrado(
             Math.random() * (canvas.width - lado),
             Math.random() * (canvas.height - lado),
             lado,
-            colorComplementario(color),
+            colorComplementario(color), // Color complementario
             ctx,
             false
         );
     },
     () => {
         let lado = Math.random() * 40 + 25; // Definir lado aleatorio
-        let color = colores[Math.floor(Math.random() * colores.length)]; // Color aleatorio
+        let color = generarColorAleatorio(); // Color aleatorio en formato rgba
         return new Rectangulo(
             Math.random() * (canvas.width - lado),
             Math.random() * (canvas.height - lado),
@@ -42,23 +42,34 @@ const crearFiguraFuncs = [
         );
     },
 ];
+function generarColorAleatorio() {
+    let r = Math.floor(Math.random() * 256);
+    let g = Math.floor(Math.random() * 256);
+    let b = Math.floor(Math.random() * 256);
+    /* let a = Math.floor(Math.random() * 30) + 246; // Transparencia aleatoria entre 200 y 255 */
+    return `rgba(${r},${g},${b},1)`;
+}
+
+// Función para generar un color complementario en formato rgba
+function colorComplementario(color) {
+    // Extraer los valores de red, verde, azul y alfa del string rgba
+    const regex = /rgba?\((\d+),\s*(\d+),\s*(\d+),?\s*([.\d]*)\)/;
+    const matches = regex.exec(color);
+    if (!matches) return 'rgba(0, 0, 0, 1)'; // Valor por defecto si no hay match
+
+    let r = 255 - parseInt(matches[1]);
+    let g = 255 - parseInt(matches[2]);
+    let b = 255 - parseInt(matches[3]);
+    let a = 1;
+
+    return `rgba(${r},${g},${b},${a})`;
+}
+
 
 let figuraIndex = 0;
 main();
 function main() {
     crearFiguras();
-}
-// Función para generar un color complementario
-function colorComplementario(color) {
-    const complementarios = {
-        red: 'cyan',
-        green: 'magenta',
-        blue: 'yellow',
-        orange: 'blue',
-        purple: 'lime',
-        cyan: 'red'
-    };
-    return complementarios[color] || 'black';
 }
 
 // Generar figuras al azar
@@ -66,25 +77,14 @@ function agregarFigura() {
     const crearFigura = crearFiguraFuncs[figuraIndex];
     const nuevaFigura = crearFigura();
     figuras.push(nuevaFigura);
-
     // Actualizar el índice para la siguiente figura
     figuraIndex = (figuraIndex + 1) % crearFiguraFuncs.length;
-    /*     for (let i = 0; i < cantFiguras; i++) {
-            let radio = Math.random() * 40 + 25;
-            let lado = Math.random() * 40 + 25;
-            let color = colores[Math.floor(Math.random() * colores.length)];
-    
-            figuras.push(new Circulo(Math.random() * (canvas.width - radio * 2) + radio, Math.random() * (canvas.height - radio * 2) + radio, radio, color));
-            figuras.push(new Cuadrado(Math.random() * (canvas.width - lado), Math.random() * (canvas.height - lado), lado, colorComplementario(color)));
-            figuras.push(new Rectangulo(Math.random() * (canvas.width - lado), Math.random() * (canvas.height - lado), lado * 2, lado, color));
-        } */
 }
 
 
 // Dibujar todas las figuras
 function crearFiguras() {
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpia el canvas
-
     if (figuras.length < cantFiguras * crearFiguraFuncs.length) {
         agregarFigura();
         delay = Math.max(40, delay - 5);
@@ -166,16 +166,18 @@ canvas.addEventListener('click', (event) => {
 // Variables para arrastrar figuras
 let figuraSeleccionada = null;
 let offsetX, offsetY;
-
+function deseleccionarFiguras() {
+    figuras.forEach(figura => {
+        figura.seleccionada = false;
+    });
+}
 // Evento de mousedown para seleccionar la figura
 canvas.addEventListener('mousedown', (event) => {
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     // Deseleccionar todas las figuras antes de seleccionar la nueva
-    figuras.forEach(figura => {
-        figura.seleccionada = false;
-    });
+    deseleccionarFiguras();
 
     // Recorre las figuras en orden inverso para detectar la más "superior"
     for (let i = figuras.length - 1; i >= 0; i--) {

@@ -1,4 +1,5 @@
-// Selecciona el canvas y su contexto
+/**@type{HTMLCanvasElement} */
+/**@type{CanvasRenderingContext2D} */
 const canvas = document.getElementById('miCanvas');
 const ctx = canvas.getContext('2d');
 
