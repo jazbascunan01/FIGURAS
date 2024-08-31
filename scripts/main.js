@@ -183,10 +183,10 @@ function seleccionarFigura(x, y) {
 }
 
 function moverFigura(x, y) {
-    figuraSeleccionada.x = x - offsetX;
-    figuraSeleccionada.y = y - offsetY;
-    figuraSeleccionada.ajustarPosicionFigura(figuraSeleccionada);
-    dibujarFiguras();
+    if (figuraSeleccionada) {
+        figuraSeleccionada.mover(x - offsetX, y - offsetY, isDragging);
+        dibujarFiguras();
+    }
 }
 
 function moverFiguraConTeclado(key) {

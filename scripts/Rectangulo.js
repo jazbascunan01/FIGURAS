@@ -65,5 +65,15 @@ class Rectangulo extends Figura {
         imageData.data[index + 2] = b;  // Blue
         imageData.data[index + 3] = 255; // Opacidad completa
     }
+    mover(x, y, arrastrando) {
+        if (arrastrando) {
+            this.x = Math.max(0, Math.min(canvas.width - this.ancho, x));
+            this.y = Math.max(0, Math.min(canvas.height - this.alto, y));
+        } else {
+            this.x = x;
+            this.y = y;
+            this.ajustarPosicionFigura();
+        }
+    }
 
 }

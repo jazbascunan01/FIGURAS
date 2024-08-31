@@ -24,4 +24,14 @@ class Circulo extends Figura {
             ctx.stroke(); // Dibujar borde
         }
     }
+    mover(x, y, arrastrando) {
+        if (arrastrando) {
+            this.x = Math.max(this.radio, Math.min(canvas.width - this.radio, x));
+            this.y = Math.max(this.radio, Math.min(canvas.height - this.radio, y));
+        } else {
+            this.x = x;
+            this.y = y;
+            this.ajustarPosicionFigura();
+        }
+    }
 }
