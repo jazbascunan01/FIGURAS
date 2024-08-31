@@ -25,4 +25,13 @@ class Figura {
     }
     // Método base para dibujar la figura (se implementará en las subclases)
     dibujar(ctx) {}
+    toJSON() {
+        return {
+            tipo: this.constructor.name,
+            x: this.x,
+            y: this.y,
+            color: this.color,
+            seleccionada: this.seleccionada
+        };
+    }
 }

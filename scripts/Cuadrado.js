@@ -11,4 +11,15 @@ class Cuadrado extends Rectangulo {
             ctx.strokeRect(this.x, this.y, this.ancho, this.alto); // Dibujar borde
         }
     }
+    toJSON() {
+        return {
+            tipo: 'Cuadrado',
+            x: this.x,
+            y: this.y,
+            ancho: this.ancho,
+            alto: this.alto,
+            color: this.color,
+            seleccionada: this.seleccionada
+        };
+    }
 }

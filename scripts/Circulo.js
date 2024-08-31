@@ -34,4 +34,13 @@ class Circulo extends Figura {
             this.ajustarPosicionFigura();
         }
     }
+    clonar() {
+        return new Circulo(this.x, this.y, this.radio, this.color, this.ctx, this.seleccionada);
+    }
+    toJSON() {
+        return {
+            ...super.toJSON(),
+            radio: this.radio,
+        };
+    }
 }

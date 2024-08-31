@@ -4,16 +4,23 @@ const canvas = document.getElementById('miCanvas');
 const ctx = canvas.getContext('2d');
 const mensajeElemento = document.getElementById('mensaje');
 const regenerarBtn = document.getElementById('regenerarFiguras');
+const deshacerBtn = document.getElementById('deshacer');
+const rehacerBtn = document.getElementById('rehacer');
 const cantFiguras = 5;
 const delayIncrement = 200; // Tiempo de retraso entre dibujos
+const velocidadMovimiento = 5; // Velocidad normal
+const velocidadMovimientoRapida = 20; // Velocidad rápida para deshacer/rehacer
 
 let figuras = [];
+let historialEstados = [];
+let indiceHistorial = -1;
 let coloresCirculos = []; // Array para almacenar colores de los círculos
 let coloresComplementariosUsados = new Set(); // Set para colores complementarios usados
 
 let figuraSeleccionada = null;
 let offsetX, offsetY;
 let isDragging = false;
+let movimientoRapido = false; // Controlar si el movimiento es rápido
 
 // Funciones Auxiliares
 function generarColorAleatorio() {
@@ -76,7 +83,7 @@ const crearFiguraFuncs = [
         const width = lado * 2;  // Asegúrate de definir width correctamente
         const height = lado;     // Asegúrate de definir height correctamente
 
-        return new Rectangulo(x, y, width, height, null, ctx, false);
+        return new Rectangulo(x, y, width, height, generarColorAleatorio(), ctx, false);
     }
 ];
 
@@ -99,7 +106,11 @@ function dibujarFigurasConDelay() {
 
 function dibujarFiguras() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    figuras.forEach(figura => figura.dibujar(ctx));
+    figuras.forEach(figura => {
+        if (figura) {
+            figura.dibujar(ctx);
+        }
+    });
 }
 
 // Funciones de Eventos
@@ -110,6 +121,8 @@ function configurarEventos() {
     canvas.addEventListener('mouseup', handleCanvasMouseUp);
     document.addEventListener('keydown', handleDocumentKeyDown);
     regenerarBtn.addEventListener('click', regenerarFiguras);
+    deshacerBtn.addEventListener('click', deshacer);
+    rehacerBtn.addEventListener('click', rehacer);
 }
 
 function handleCanvasClick(event) {
@@ -133,14 +146,118 @@ function handleCanvasMouseMove(event) {
 function handleCanvasMouseUp() {
     figuraSeleccionada = null;
     isDragging = false;
+    guardarEstado(); // Guardar estado después de mover la figura
     dibujarFiguras();
 }
 
 function handleDocumentKeyDown(event) {
-    if (figuraSeleccionada) {
+    if (event.ctrlKey && event.key === 'z') {
+        deshacer();
+    } else if (event.ctrlKey && event.key === 'y') {
+        rehacer();
+    } else if (figuraSeleccionada) {
         moverFiguraConTeclado(event.key);
+        guardarEstado(); // Guardar estado después de mover con teclado
     }
 }
+function actualizarEstadoBotones() {
+    deshacerBtn.disabled = indiceHistorial <= 0;
+    rehacerBtn.disabled = indiceHistorial >= historialEstados.length - 1;
+}
+
+function guardarEstado() {
+    const figuraSeleccionadaIndex = figuraSeleccionada ? figuras.indexOf(figuraSeleccionada) : -1;
+
+    historialEstados = historialEstados.slice(0, indiceHistorial + 1);
+    historialEstados.push(JSON.stringify({
+        figuras: figuras.map(figura => figura.toJSON()),
+        figuraSeleccionadaIndex
+    }));
+    indiceHistorial++;
+    actualizarEstadoBotones(); // Actualizar el estado de los botones después de guardar
+}
+
+
+
+
+function deshacer() {
+    if (indiceHistorial > 0) {
+        figuraSeleccionadaAntesAccion = figuraSeleccionada;
+
+        // Realizar deshacer
+        indiceHistorial--;
+        movimientoRapido = true; // Activar movimiento rápido para deshacer
+        const estado = JSON.parse(historialEstados[indiceHistorial]);
+        figuras = estado.figuras.map(figuraData => reconstruirFigura(figuraData));
+        const figuraIndex = estado.figuraSeleccionadaIndex;
+        figuraSeleccionada = (figuraIndex >= 0 && figuraIndex < figuras.length) ? figuras[figuraIndex] : null;
+
+        console.log('Después de deshacer - Figura seleccionada:', figuraSeleccionada);
+
+        dibujarFiguras();
+        movimientoRapido = false; // Desactivar movimiento rápido después de deshacer
+
+        if (figuraSeleccionada) {
+            figuraSeleccionada.seleccionada = true;
+        }
+        dibujarFiguras(); // Redibujar para reflejar la selección
+        actualizarEstadoBotones(); 
+    }
+}
+
+function rehacer() {
+    if (indiceHistorial < historialEstados.length - 1) {
+        figuraSeleccionadaAntesAccion = figuraSeleccionada;
+
+        // Realizar rehacer
+        indiceHistorial++;
+        movimientoRapido = true; // Activar movimiento rápido para rehacer
+        const estado = JSON.parse(historialEstados[indiceHistorial]);
+        figuras = estado.figuras.map(figuraData => reconstruirFigura(figuraData));
+        const figuraIndex = estado.figuraSeleccionadaIndex;
+        figuraSeleccionada = (figuraIndex >= 0 && figuraIndex < figuras.length) ? figuras[figuraIndex] : null;
+
+        console.log('Después de rehacer - Figura seleccionada:', figuraSeleccionada);
+
+        dibujarFiguras();
+        movimientoRapido = false; // Desactivar movimiento rápido después de rehacer
+
+        if (figuraSeleccionada) {
+            figuraSeleccionada.seleccionada = true;
+        }
+        dibujarFiguras(); // Redibujar para reflejar la selección
+        actualizarEstadoBotones(); 
+    }
+}
+
+function reconstruirFigura(figuraData) {
+    let figura;
+    switch (figuraData.tipo) {
+        case 'Circulo':
+            figura = new Circulo(figuraData.x, figuraData.y, figuraData.radio, figuraData.color);
+            break;
+        case 'Cuadrado':
+            figura = new Cuadrado(figuraData.x, figuraData.y, figuraData.ancho, figuraData.color);
+            break;
+        case 'Rectangulo':
+            figura = new Rectangulo(
+                figuraData.x,
+                figuraData.y,
+                figuraData.ancho,
+                figuraData.alto,
+                figuraData.color,
+                figuraData.colorInicio,
+                figuraData.colorFin
+            );
+            break;
+        default:
+            return null;
+    }
+    figura.seleccionada = figuraData.seleccionada; // Restaurar el estado de selección
+    return figura;
+}
+
+
 
 // Funciones de Utilidad
 function getCanvasCoordinates(event) {
@@ -190,7 +307,7 @@ function moverFigura(x, y) {
 }
 
 function moverFiguraConTeclado(key) {
-    const step = 5;
+    const step = movimientoRapido ? velocidadMovimientoRapida : velocidadMovimiento;
     switch (key) {
         case 'ArrowUp':
             figuraSeleccionada.y -= step;
@@ -212,18 +329,39 @@ function moverFiguraConTeclado(key) {
 function deseleccionarFiguras() {
     figuras.forEach(figura => figura.seleccionada = false);
 }
+
 function regenerarFiguras() {
+    // Deshabilitar el botón de deshacer mientras se regeneran las figuras
+    deshacerBtn.disabled = true;
+
+    // Limpiar el historial de estados
+    historialEstados = [];
+    indiceHistorial = -1;
+
     figuras = []; // Limpiar figuras existentes
     coloresCirculos = []; // Limpiar colores de círculos
     coloresComplementariosUsados = new Set(); // Limpiar colores complementarios usados
-    crearFigurasIniciales(); // Crear nuevas figuras
+
+    // Crear nuevas figuras y dibujarlas
+    crearFigurasIniciales();
+
+    // Guardar el estado después de crear las nuevas figuras
+    guardarEstado();
+
+    // Habilitar el botón de deshacer después de que el canvas ha sido actualizado
+    setTimeout(() => {
+        actualizarEstadoBotones(); // Actualizar el estado de los botones
+    }, cantFiguras * delayIncrement); // Ajustar el tiempo según el retraso total de los dibujos
 }
+
 
 
 // Función Principal
 function main() {
     crearFigurasIniciales();
+    guardarEstado();
     configurarEventos();
+    actualizarEstadoBotones();
 }
 
 function crearFigurasIniciales() {
