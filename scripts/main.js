@@ -10,6 +10,7 @@ const cantFiguras = 5;
 const delayIncrement = 200; // Tiempo de retraso entre dibujos
 const velocidadMovimiento = 5; // Velocidad normal
 const velocidadMovimientoRapida = 20; // Velocidad rápida para deshacer/rehacer
+const reiniciarBtn = document.getElementById('reiniciar');
 
 let figuras = [];
 let historialEstados = [];
@@ -123,6 +124,8 @@ function configurarEventos() {
     regenerarBtn.addEventListener('click', regenerarFiguras);
     deshacerBtn.addEventListener('click', deshacer);
     rehacerBtn.addEventListener('click', rehacer);
+    reiniciarBtn.addEventListener('click', reiniciarCanvas);
+    reiniciarBtn.disabled = true; 
 }
 
 function handleCanvasClick(event) {
@@ -177,7 +180,42 @@ function guardarEstado() {
     actualizarEstadoBotones(); // Actualizar el estado de los botones después de guardar
 }
 
+let estadoInicial = null;
+let cambiosRealizados = false;
 
+// Función para guardar el estado inicial
+function guardarEstadoInicial() {
+    estadoInicial = JSON.stringify({
+        figuras: figuras.map(figura => figura.toJSON())
+    });
+    cambiosRealizados = true;
+}
+
+// Función para restaurar el estado inicial
+function restaurarEstadoInicial() {
+    if (estadoInicial) {
+        const estado = JSON.parse(estadoInicial);
+        figuras = estado.figuras.map(figuraData => reconstruirFigura(figuraData));
+        dibujarFiguras();
+    }
+}
+
+function reiniciarCanvas() {
+    if (cambiosRealizados) { // Verifica si se han realizado cambios
+        // Restaurar el estado inicial del lienzo
+        restaurarEstadoInicial();
+
+        // Limpiar el historial de deshacer/rehacer
+        historialEstados = [];
+        indiceHistorial = -1;
+
+        // Actualizar el estado de los botones
+        actualizarEstadoBotones();
+
+        cambiosRealizados = false; // Restablecer la variable después de reiniciar
+        reiniciarBtn.disabled = true; // Bloquear el botón de reiniciar después de reiniciar
+    }
+}
 
 
 function deshacer() {
@@ -303,6 +341,8 @@ function moverFigura(x, y) {
     if (figuraSeleccionada) {
         figuraSeleccionada.mover(x - offsetX, y - offsetY, isDragging);
         dibujarFiguras();
+        cambiosRealizados = true;
+        reiniciarBtn.disabled = false;
     }
 }
 
@@ -330,6 +370,7 @@ function deseleccionarFiguras() {
     figuras.forEach(figura => figura.seleccionada = false);
 }
 
+
 function regenerarFiguras() {
     // Deshabilitar el botón de deshacer mientras se regeneran las figuras
     deshacerBtn.disabled = true;
@@ -347,11 +388,14 @@ function regenerarFiguras() {
 
     // Guardar el estado después de crear las nuevas figuras
     guardarEstado();
+    guardarEstadoInicial(); // Actualizar el estado inicial después de regenerar las figuras
 
     // Habilitar el botón de deshacer después de que el canvas ha sido actualizado
     setTimeout(() => {
         actualizarEstadoBotones(); // Actualizar el estado de los botones
     }, cantFiguras * delayIncrement); // Ajustar el tiempo según el retraso total de los dibujos
+
+    cambiosRealizados = false; // Después de regenerar, no hay cambios hasta que se mueva una figura
 }
 
 
@@ -359,10 +403,12 @@ function regenerarFiguras() {
 // Función Principal
 function main() {
     crearFigurasIniciales();
-    guardarEstado();
+    guardarEstado(); // Guardar el estado después de crear las figuras iniciales
+    guardarEstadoInicial(); // Guardar el estado inicial
     configurarEventos();
     actualizarEstadoBotones();
 }
+
 
 function crearFigurasIniciales() {
     crearFiguras(0, cantFiguras); // Círculos
