@@ -20,7 +20,7 @@ class Circulo extends Figura {
 
         if (this.seleccionada) {
             ctx.strokeStyle = 'white'; // Color del borde de selección
-            ctx.lineWidth = 1; // Ancho del borde
+            ctx.lineWidth = 2; // Ancho del borde
             ctx.stroke(); // Dibujar borde
         }
     }
