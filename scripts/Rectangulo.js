@@ -5,7 +5,7 @@ class Rectangulo extends Figura {
         this.alto = alto;
         this.color = color;
 
-        // Si no se proporcionan colores de degradado, generarlos aleatoriamente
+        // Si no viene por parametro color de degradado, generarlos aleatoriamente (por si en un futuro se quiere hacer con un color dado)
         if (!colorInicio || !colorFin) {
             this.colorInicio = {
                 r: Math.floor(Math.random() * 256),
@@ -51,7 +51,7 @@ class Rectangulo extends Figura {
                 this.setPixel(imageData, x, y, r, g, b);
             }
         }
-        
+
         // Ajustar la posición considerando la escala
         ctx.putImageData(imageData, this.x - (anchoEscalado - this.ancho) / 2, this.y - (altoEscalado - this.alto) / 2);
 
