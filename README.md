@@ -41,6 +41,11 @@ La interfaz incluye los siguientes elementos:
 
 - **Color de los Cuadrados**: El color de los cuadrados es el complementario al promedio de los colores de los círculos actuales.
 - **Movimiento con el Teclado**: Las figuras se moverán más allá de los límites del lienzo y aparecerán del lado opuesto cuando se utilicen las teclas de flecha.
+- **Detalles del Cursor**:
+  - **Manito (Pointer)**: 🖱️ - Cuando el cursor pasa por encima de un botón, se transforma en una mano para indicar que es clickeable.
+  - **Flechita (Arrow)**: ⬅️ - El cursor se muestra como una flecha estándar cuando está en reposo.
+  - **Not-Allowed (Prohibido)**: 🚫 - Los botones bloqueados muestran un cursor en forma de "prohibido" para indicar que no están disponibles.
+  - **Move (Mover)**: ↔️ - Cuando se arrastra una figura, el cursor cambia a una flecha con cuatro direcciones para indicar que se está moviendo.
 
 ### Recursos Utilizados
 
@@ -55,3 +60,7 @@ Desarrollado por [**Bascuñan Karen Jazmín**](https://jazbascunan01.github.io/)
 ## Enlace al Sitio Web
 
 Puedes acceder a la aplicación en el siguiente enlace: [Aplicación de Figuras](https://jazbascunan01.github.io/FIGURAS/)
+
+## Repositorio en GitHub
+
+El código fuente está disponible en: [https://github.com/jazbascunan01/FIGURAS.git](https://github.com/jazbascunan01/FIGURAS.git)
