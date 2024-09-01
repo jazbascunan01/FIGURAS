@@ -1,4 +1,3 @@
-// Clase para círculos
 class Circulo extends Figura {
     constructor(x, y, radio, color) {
         super(x, y);
@@ -13,31 +12,22 @@ class Circulo extends Figura {
     }
 
     dibujar(ctx) {
-        // Ajustar la escala
         const escala = this.seleccionada ? 1.1 : 1;
-
-        // Guardar el estado del contexto
         ctx.save();
-
-        // Aplicar la transformación
         ctx.translate(this.x, this.y);
         ctx.scale(escala, escala);
         ctx.translate(-this.x, -this.y);
-
-        // Dibujar el círculo
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radio, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
         ctx.fill();
 
-        // Dibujar el borde si está seleccionado
         if (this.seleccionada) {
-            ctx.strokeStyle = 'white'; // Color del borde de selección
-            ctx.lineWidth = 2; // Ancho del borde
-            ctx.stroke(); // Dibujar borde
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.stroke();
         }
 
-        // Restaurar el estado del contexto
         ctx.restore();
     }
     mover(x, y, arrastrando) {
