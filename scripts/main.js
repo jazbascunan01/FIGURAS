@@ -1,3 +1,9 @@
+    /*|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|*/
+    /*|                                          |*/
+    /*|              INICIALIZACIÓN              |*/
+    /*|                                          |*/
+    /*|__________________________________________|*/
+
 /**@type{HTMLCanvasElement} */
 /**@type{CanvasRenderingContext2D} */
 const canvas = document.getElementById('miCanvas');
@@ -6,11 +12,19 @@ const mensajeElemento = document.getElementById('mensaje');
 const regenerarBtn = document.getElementById('regenerarFiguras');
 const deshacerBtn = document.getElementById('deshacer');
 const rehacerBtn = document.getElementById('rehacer');
+const reiniciarBtn = document.getElementById('reiniciar');
+const descargarImagenBtn = document.getElementById('descargarImagen');
+
+    /*|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|*/
+    /*|                                          |*/
+    /*|            VARIABLES GLOBALES            |*/
+    /*|                                          |*/
+    /*|__________________________________________|*/
+
 const cantFiguras = 5;
 const delayIncrement = 200;
 const velocidadMovimiento = 5;
-const velocidadMovimientoRapida = 20; 
-const reiniciarBtn = document.getElementById('reiniciar');
+const velocidadMovimientoRapida = 20;
 
 let figuras = [];
 let historialEstados = [];
@@ -26,7 +40,13 @@ let movimientoRapido = false;
 let estadoInicial = null;
 let cambiosRealizados = false;
 
-// Funciones Auxiliares
+
+    /*|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|*/
+    /*|                                          |*/
+    /*|          FUNCIONES AUXILIARES            |*/
+    /*|                                          |*/
+    /*|__________________________________________|*/
+
 function generarColorAleatorio() {
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);
@@ -37,15 +57,68 @@ function generarColorAleatorio() {
 function colorComplementario(color) {
     const regex = /rgba?\((\d+),\s*(\d+),\s*(\d+),?\s*([.\d]*)\)/;
     const matches = regex.exec(color);
-    if (!matches) return 'rgba(0, 0, 0, 1)'; // Valor por defecto si no hay match
+    if (!matches) return 'rgba(0, 0, 0, 1)';
 
     const r = 255 - parseInt(matches[1]);
     const g = 255 - parseInt(matches[2]);
     const b = 255 - parseInt(matches[3]);
     return `rgba(${r},${g},${b},1)`;
 }
+function actualizarEstadoBotones() {
+    deshacerBtn.disabled = indiceHistorial <= 0;
+    rehacerBtn.disabled = indiceHistorial >= historialEstados.length - 1;
+}
 
-// Funciones de Creación de Figuras
+function guardarEstado() {
+    const estadoActual = JSON.stringify({
+        figuras: figuras.map(figura => figura.toJSON()),
+        figuraSeleccionadaIndex: figuraSeleccionada ? figuras.indexOf(figuraSeleccionada) : -1
+    });
+
+    // No guardar si el estado actual es igual al último guardado
+    if (historialEstados.length === 0 || historialEstados[indiceHistorial] !== estadoActual) {
+        historialEstados = historialEstados.slice(0, indiceHistorial + 1);
+        historialEstados.push(estadoActual);
+        indiceHistorial++;
+        actualizarEstadoBotones();
+        cambiosRealizados = true;
+        reiniciarBtn.disabled = false; // Habilitar el botón de reinicio si se ha realizado un cambio
+    }
+}
+
+function guardarEstadoInicial() {
+    estadoInicial = JSON.stringify({
+        figuras: figuras.map(figura => figura.toJSON())
+    });
+    cambiosRealizados = true;
+}
+
+function restaurarEstadoInicial() {
+    if (estadoInicial) {
+        const estado = JSON.parse(estadoInicial);
+        figuras = estado.figuras.map(figuraData => reconstruirFigura(figuraData));
+        dibujarFiguras();
+    }
+}
+
+function reiniciarCanvas() {
+    if (cambiosRealizados) {
+        restaurarEstadoInicial();
+        historialEstados = [];
+        indiceHistorial = -1;
+        guardarEstado();
+        actualizarEstadoBotones();
+        cambiosRealizados = false;
+        reiniciarBtn.disabled = true;
+    }
+}
+
+    /*|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|*/
+    /*|                                          |*/
+    /*|            CREACIÓN DE FIGURAS           |*/
+    /*|                                          |*/
+    /*|__________________________________________|*/
+
 const crearFiguraFuncs = [
     () => {
         const radio = Math.random() * 40 + 25;
@@ -68,7 +141,7 @@ const crearFiguraFuncs = [
             const colorCirculo = coloresCirculos[Math.floor(Math.random() * coloresCirculos.length)];
             colorComplementarioCuadrado = colorComplementario(colorCirculo);
         } while (coloresComplementariosUsados.has(colorComplementarioCuadrado));
-        
+
         coloresComplementariosUsados.add(colorComplementarioCuadrado);
         console.log(`Cuadrado - Color complementario: ${colorComplementarioCuadrado}`);
         return new Cuadrado(
@@ -99,10 +172,20 @@ function crearFiguras(figuraIndex, cantidad) {
         }
     }
 }
+function crearFigurasIniciales() {
+    crearFiguras(0, cantFiguras); // Círculos
+    crearFiguras(1, cantFiguras); // Cuadrados
+    crearFiguras(2, cantFiguras); // Rectángulos
+    dibujarFigurasConDelay(); // Inicialmente dibujar con retraso
+}
 
-/* *
-    Funciones de Dibujo 
-                        */
+
+    /*|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|*/
+    /*|                                          |*/
+    /*|          FUNCIONES DE DIBUJO             |*/
+    /*|                                          |*/
+    /*|__________________________________________|*/
+
 function dibujarFigurasConDelay() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     figuras.forEach((figura, index) => {
@@ -119,7 +202,12 @@ function dibujarFiguras() {
     });
 }
 
-// Funciones de Eventos
+    /*|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|*/
+    /*|                                          |*/
+    /*|                 EVENTOS                  |*/
+    /*|                                          |*/
+    /*|__________________________________________|*/
+
 function configurarEventos() {
     canvas.addEventListener('click', handleCanvasClick);
     canvas.addEventListener('mousedown', handleCanvasMouseDown);
@@ -130,9 +218,17 @@ function configurarEventos() {
     deshacerBtn.addEventListener('click', deshacer);
     rehacerBtn.addEventListener('click', rehacer);
     reiniciarBtn.addEventListener('click', reiniciarCanvas);
-    reiniciarBtn.disabled = true; 
+    canvas.addEventListener('mouseleave', handleCanvasMouseLeave);
+    descargarImagenBtn.addEventListener('click', handleDownloadButton)
+    reiniciarBtn.disabled = true;
 }
-
+function handleDownloadButton() {
+    const canvas = document.getElementById('miCanvas');
+    const link = document.createElement('a');
+    link.download = 'canvas_image.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+};
 function handleCanvasClick(event) {
     const { x, y } = getCanvasCoordinates(event);
     procesarClick(x, y);
@@ -143,7 +239,7 @@ function handleCanvasMouseDown(event) {
     deseleccionarFiguras();
     seleccionarFigura(x, y);
     if (figuraSeleccionada) {
-        canvas.style.cursor = 'move'; // Cambia el cursor a "move" cuando seleccionas una figura
+        canvas.style.cursor = 'move';
     }
 }
 
@@ -154,11 +250,12 @@ function handleCanvasMouseMove(event) {
         canvas.style.cursor = 'move';
     }
 }
-
 function handleCanvasMouseUp() {
+    if (isDragging) {
+        guardarEstado();
+    }
     figuraSeleccionada = null;
     isDragging = false;
-    guardarEstado(); // Guardar estado después de mover la figura
     dibujarFiguras();
     canvas.style.cursor = 'default';
 }
@@ -170,81 +267,32 @@ function handleDocumentKeyDown(event) {
         rehacer();
     } else if (figuraSeleccionada) {
         moverFiguraConTeclado(event.key);
-        guardarEstado(); // Guardar estado después de mover con teclado
+        guardarEstado();
     }
-
 }
-function actualizarEstadoBotones() {
-    deshacerBtn.disabled = indiceHistorial <= 0;
-    rehacerBtn.disabled = indiceHistorial >= historialEstados.length - 1;
-}
-
-function guardarEstado() {
-    const figuraSeleccionadaIndex = figuraSeleccionada ? figuras.indexOf(figuraSeleccionada) : -1;
-
-    historialEstados = historialEstados.slice(0, indiceHistorial + 1);
-    historialEstados.push(JSON.stringify({
-        figuras: figuras.map(figura => figura.toJSON()),
-        figuraSeleccionadaIndex
-    }));
-    indiceHistorial++;
-    actualizarEstadoBotones(); // Actualizar el estado de los botones después de guardar
-}
-
-
-
-// Función para guardar el estado inicial
-function guardarEstadoInicial() {
-    estadoInicial = JSON.stringify({
-        figuras: figuras.map(figura => figura.toJSON())
-    });
-    cambiosRealizados = true;
-}
-
-// Función para restaurar el estado inicial
-function restaurarEstadoInicial() {
-    if (estadoInicial) {
-        const estado = JSON.parse(estadoInicial);
-        figuras = estado.figuras.map(figuraData => reconstruirFigura(figuraData));
+function handleCanvasMouseLeave() {
+    if (isDragging) {
+        // Soltar la figura si se está arrastrando cuando el cursor sale del canvas
+        isDragging = false;
+        // Mantener la figura seleccionada
+        if (figuraSeleccionada) {
+            figuraSeleccionada.seleccionada = true;
+        }
+        else {
+            canvas.style.cursor = 'default';
+        }
+        guardarEstado();
         dibujarFiguras();
     }
+    if (!isDragging) {
+        canvas.style.cursor = 'default';
+    }
 }
-const descargarImagenBtn = document.getElementById('descargarImagen');
-        descargarImagenBtn.addEventListener('click', () => {
-            const canvas = document.getElementById('miCanvas');
-            const link = document.createElement('a');
-            link.download = 'canvas_image.png'; // Nombre de la imagen descargada
-            link.href = canvas.toDataURL('image/png');
-            link.click(); // Simula el clic para iniciar la descarga
-        });
-
-        function reiniciarCanvas() {
-            if (cambiosRealizados) { // Verifica si se han realizado cambios
-                // Restaurar el estado inicial del lienzo
-                restaurarEstadoInicial();
-        
-                // Limpiar el historial de deshacer/rehacer
-                historialEstados = [];
-                indiceHistorial = -1;
-        
-                // Guardar el estado inmediatamente después de reiniciar
-                guardarEstado();
-                actualizarEstadoBotones(); // Actualizar el estado de los botones
-        
-                cambiosRealizados = false; // Restablecer la variable después de reiniciar
-                reiniciarBtn.disabled = true; // Bloquear el botón de reiniciar después de reiniciar
-            }
-        }
-        
-
-
 function deshacer() {
     if (indiceHistorial > 0) {
         figuraSeleccionadaAntesAccion = figuraSeleccionada;
-
-        // Realizar deshacer
         indiceHistorial--;
-        movimientoRapido = true; // Activar movimiento rápido para deshacer
+        movimientoRapido = true;
         const estado = JSON.parse(historialEstados[indiceHistorial]);
         figuras = estado.figuras.map(figuraData => reconstruirFigura(figuraData));
         const figuraIndex = estado.figuraSeleccionadaIndex;
@@ -253,13 +301,13 @@ function deshacer() {
         console.log('Después de deshacer - Figura seleccionada:', figuraSeleccionada);
 
         dibujarFiguras();
-        movimientoRapido = false; // Desactivar movimiento rápido después de deshacer
+        movimientoRapido = false;
 
         if (figuraSeleccionada) {
             figuraSeleccionada.seleccionada = true;
         }
-        dibujarFiguras(); // Redibujar para reflejar la selección
-        actualizarEstadoBotones(); 
+        dibujarFiguras();
+        actualizarEstadoBotones();
         if (indiceHistorial === 0) {
             reiniciarBtn.disabled = true;
         }
@@ -269,10 +317,8 @@ function deshacer() {
 function rehacer() {
     if (indiceHistorial < historialEstados.length - 1) {
         figuraSeleccionadaAntesAccion = figuraSeleccionada;
-
-        // Realizar rehacer
         indiceHistorial++;
-        movimientoRapido = true; // Activar movimiento rápido para rehacer
+        movimientoRapido = true;
         const estado = JSON.parse(historialEstados[indiceHistorial]);
         figuras = estado.figuras.map(figuraData => reconstruirFigura(figuraData));
         const figuraIndex = estado.figuraSeleccionadaIndex;
@@ -281,13 +327,13 @@ function rehacer() {
         console.log('Después de rehacer - Figura seleccionada:', figuraSeleccionada);
 
         dibujarFiguras();
-        movimientoRapido = false; // Desactivar movimiento rápido después de rehacer
+        movimientoRapido = false;
 
         if (figuraSeleccionada) {
             figuraSeleccionada.seleccionada = true;
         }
-        dibujarFiguras(); // Redibujar para reflejar la selección
-        actualizarEstadoBotones(); 
+        dibujarFiguras();
+        actualizarEstadoBotones();
 
         // Habilitar el botón de "Reiniciar" si se han realizado cambios
         reiniciarBtn.disabled = false;
@@ -323,9 +369,12 @@ function reconstruirFigura(figuraData) {
     return figura;
 }
 
+    /*|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|*/
+    /*|                                          |*/
+    /*|          FUNCIONES DE UTILIDAD           |*/
+    /*|                                          |*/
+    /*|__________________________________________|*/
 
-
-// Funciones de Utilidad
 function getCanvasCoordinates(event) {
     const rect = canvas.getBoundingClientRect();
     return {
@@ -336,6 +385,7 @@ function getCanvasCoordinates(event) {
 
 function procesarClick(x, y) {
     let figuraEncontrada = false;
+    let figuraAnteriormenteSeleccionada = figuraSeleccionada;
 
     figuras.forEach(figura => figura.seleccionada = false);
 
@@ -348,9 +398,20 @@ function procesarClick(x, y) {
         }
     }
 
+    // Solo guarda el estado si se realizó un cambio significativo
+    if (figuraAnteriormenteSeleccionada !== figuraSeleccionada || !figuraSeleccionada) {
+        guardarEstado();
+    }
+
     mensajeElemento.textContent = figuraEncontrada ? '¡Clic dentro de una figura!' : 'En ese lugar no se encuentra ninguna figura.';
     dibujarFiguras();
 }
+
+    /*|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|*/
+    /*|                                          |*/
+    /*|                  FIGURAS                 |*/
+    /*|                                          |*/
+    /*|__________________________________________|*/
 
 function seleccionarFigura(x, y) {
     for (let i = figuras.length - 1; i >= 0; i--) {
@@ -376,25 +437,33 @@ function moverFigura(x, y) {
 
 function moverFiguraConTeclado(key) {
     const step = movimientoRapido ? velocidadMovimientoRapida : velocidadMovimiento;
+    let cambio = false;
     switch (key) {
         case 'ArrowUp':
             figuraSeleccionada.y -= step;
+            cambio = true;
             break;
         case 'ArrowDown':
             figuraSeleccionada.y += step;
+            cambio = true;
             break;
         case 'ArrowLeft':
             figuraSeleccionada.x -= step;
+            cambio = true;
             break;
         case 'ArrowRight':
             figuraSeleccionada.x += step;
+            cambio = true;
             break;
     }
-    figuraSeleccionada.ajustarPosicionFigura(figuraSeleccionada);
-    guardarEstado();
-    dibujarFiguras();
-    cambiosRealizados = true; // Indicar que se han realizado cambios
-    reiniciarBtn.disabled = false; // Habilitar el botón de reinicio
+
+    if (cambio) {
+        figuraSeleccionada.ajustarPosicionFigura(figuraSeleccionada);
+        guardarEstado();
+        dibujarFiguras();
+        cambiosRealizados = true; // Indicar que se han realizado cambios
+        reiniciarBtn.disabled = false; // Habilitar el botón de reinicio
+    }
 }
 
 
@@ -404,66 +473,36 @@ function deseleccionarFiguras() {
 
 
 function regenerarFiguras() {
-    // Deshabilitar el botón de deshacer mientras se regeneran las figuras
     deshacerBtn.disabled = true;
-
-    // Limpiar el historial de estados
     historialEstados = [];
     indiceHistorial = -1;
-
-    figuras = []; // Limpiar figuras existentes
-    coloresCirculos = []; // Limpiar colores de círculos
-    coloresComplementariosUsados = new Set(); // Limpiar colores complementarios usados
-
-    // Crear nuevas figuras y dibujarlas
+    figuras = [];
+    coloresCirculos = [];
+    coloresComplementariosUsados = new Set();
     crearFigurasIniciales();
-
-    // Guardar el estado después de crear las nuevas figuras
     guardarEstado();
-    guardarEstadoInicial(); // Actualizar el estado inicial después de regenerar las figuras
-
-    // Habilitar el botón de deshacer después de que el canvas ha sido actualizado
+    guardarEstadoInicial();
     setTimeout(() => {
-        actualizarEstadoBotones(); // Actualizar el estado de los botones
-    }, cantFiguras * delayIncrement); // Ajustar el tiempo según el retraso total de los dibujos
-
-    cambiosRealizados = false; // Después de regenerar, no hay cambios hasta que se mueva una figura
+        actualizarEstadoBotones();
+    }, cantFiguras * delayIncrement);
+    cambiosRealizados = false;
 }
 
 
+    /*|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|*/
+    /*|                                          |*/
+    /*|                   MAIN                   |*/
+    /*|                                          |*/
+    /*|__________________________________________|*/
 
-// Función Principal
 function main() {
     crearFigurasIniciales();
-    guardarEstado(); // Guardar el estado después de crear las figuras iniciales
-    guardarEstadoInicial(); // Guardar el estado inicial
+    guardarEstado();
+    guardarEstadoInicial();
     configurarEventos();
     actualizarEstadoBotones();
 }
 
-
-function crearFigurasIniciales() {
-    crearFiguras(0, cantFiguras); // Círculos
-    crearFiguras(1, cantFiguras); // Cuadrados
-    crearFiguras(2, cantFiguras); // Rectángulos
-    dibujarFigurasConDelay(); // Inicialmente dibujar con retraso
-}
-
-// Inicializar la aplicación
 main();
-canvas.addEventListener('mouseleave', handleCanvasMouseLeave);
 
-function handleCanvasMouseLeave() {
-    if (isDragging) {
-        // Suelta la figura si se está arrastrando cuando el cursor sale del canvas
-        isDragging = false;
 
-        // Mantén la figura seleccionada
-        if (figuraSeleccionada) {
-            figuraSeleccionada.seleccionada = true;
-        }
-
-        guardarEstado(); // Guardar el estado al soltar la figura
-        dibujarFiguras(); // Redibuja para reflejar la selección
-    }
-}
