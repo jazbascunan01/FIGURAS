@@ -23,7 +23,7 @@ class Figura {
             figura.y = canvas.height;
         }
     }
-    // Método base para dibujar la figura (se implementará en las subclases)
+    // Método base para dibujar la figura
     dibujar(ctx) {}
     toJSON() {
         return {
@@ -35,6 +35,6 @@ class Figura {
         };
     }
     ajustarEscala() {
-        this.escala = this.seleccionada ? 1.2 : 1; // Agranda la figura un 10% si está seleccionada
+        this.escala = this.seleccionada ? 1.2 : 1;
     }
 }
