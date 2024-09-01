@@ -1,8 +1,12 @@
+# Aplicación de Figuras en Canvas
+Esta aplicación permite crear y gestionar figuras en un lienzo HTML, ofreciendo herramientas para generar, mover, deshacer, rehacer y guardar figuras. 
+
+
 ## Uso de la Aplicación
 
 ### Interfaz
 
-La aplicación se basa en un lienzo HTML donde puedes interactuar con diversas figuras. La interfaz incluye los siguientes elementos:
+La interfaz incluye los siguientes elementos:
 
 - **Lienzo de Dibujo**: Área principal donde se muestran y manipulan las figuras.
 - **Botones**:
@@ -44,3 +48,10 @@ La aplicación se basa en un lienzo HTML donde puedes interactuar con diversas f
 - **JavaScript**: Para la lógica de aplicación, manejo de eventos y manipulación del lienzo.
 - **CSS**: Para el diseño y estilo de los elementos de la interfaz.
 
+## Desarrollador
+
+Desarrollado por [**Bascuñan Karen Jazmín**](https://jazbascunan01.github.io/).
+
+## Enlace al Sitio Web
+
+Puedes acceder a la aplicación en el siguiente enlace: [Aplicación de Figuras](https://jazbascunan01.github.io/FIGURAS/)
