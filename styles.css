@@ -15,20 +15,24 @@ canvas {
     border-radius: 10%;
     box-shadow: 5px 5px 15px rgb(255 255 255 / 50%);
 }
-.container{
+
+.container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
-#mensaje{
+
+#mensaje {
     color: white;
     font-family: monospace;
 }
-h1{
+
+h1 {
     color: white;
     font-family: monospace;
 }
+
 #regenerarFiguras {
     background-color: #122c66;
     color: white;
@@ -40,20 +44,29 @@ h1{
     box-shadow: 5px 5px 15px rgb(0 0 0);
     transition: background-color 1s cubic-bezier(0.42, 0, 0.58, 1), color 0.5s cubic-bezier(0.42, 0, 0.58, 1);
 }
-#regenerarFiguras:hover, #deshacer:hover, #rehacer:hover, #reiniciar:hover, #descargarImagen:hover{
+
+#regenerarFiguras:hover,
+#deshacer:hover,
+#rehacer:hover,
+#reiniciar:hover,
+#descargarImagen:hover {
     background-color: #322e4b;
     box-shadow: 5px 5px 15px rgb(28, 31, 89);
     cursor: pointer;
     font-size: large;
 }
+
 button img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-#deshacer, #rehacer, #reiniciar, #descargarImagen{
-    width:50px;
+#deshacer,
+#rehacer,
+#reiniciar,
+#descargarImagen {
+    width: 50px;
     background-color: #122c66;
     color: white;
     margin: 0.5%;
@@ -63,15 +76,18 @@ button img {
     box-shadow: 5px 5px 15px rgb(0 0 0);
     transition: background-color 1s cubic-bezier(0.42, 0, 0.58, 1), color 0.5s cubic-bezier(0.42, 0, 0.58, 1);
 }
-.button-container{
+
+.button-container {
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 1%;
 }
+
 button:hover {
     transform: scale(1.1);
 }
+
 button:disabled {
     background-color: grey;
     color: #cccccc;
@@ -83,6 +99,7 @@ button:disabled img {
     opacity: 0.5;
     cursor: no-drop;
 }
+
 button:disabled:hover {
     transform: none;
     transition: none;
