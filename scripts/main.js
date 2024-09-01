@@ -199,23 +199,33 @@ function restaurarEstadoInicial() {
         dibujarFiguras();
     }
 }
+const descargarImagenBtn = document.getElementById('descargarImagen');
+        descargarImagenBtn.addEventListener('click', () => {
+            const canvas = document.getElementById('miCanvas');
+            const link = document.createElement('a');
+            link.download = 'canvas_image.png'; // Nombre de la imagen descargada
+            link.href = canvas.toDataURL('image/png');
+            link.click(); // Simula el clic para iniciar la descarga
+        });
 
-function reiniciarCanvas() {
-    if (cambiosRealizados) { // Verifica si se han realizado cambios
-        // Restaurar el estado inicial del lienzo
-        restaurarEstadoInicial();
-
-        // Limpiar el historial de deshacer/rehacer
-        historialEstados = [];
-        indiceHistorial = -1;
-
-        // Actualizar el estado de los botones
-        actualizarEstadoBotones();
-
-        cambiosRealizados = false; // Restablecer la variable después de reiniciar
-        reiniciarBtn.disabled = true; // Bloquear el botón de reiniciar después de reiniciar
-    }
-}
+        function reiniciarCanvas() {
+            if (cambiosRealizados) { // Verifica si se han realizado cambios
+                // Restaurar el estado inicial del lienzo
+                restaurarEstadoInicial();
+        
+                // Limpiar el historial de deshacer/rehacer
+                historialEstados = [];
+                indiceHistorial = -1;
+        
+                // Guardar el estado inmediatamente después de reiniciar
+                guardarEstado();
+                actualizarEstadoBotones(); // Actualizar el estado de los botones
+        
+                cambiosRealizados = false; // Restablecer la variable después de reiniciar
+                reiniciarBtn.disabled = true; // Bloquear el botón de reiniciar después de reiniciar
+            }
+        }
+        
 
 
 function deshacer() {
@@ -363,8 +373,12 @@ function moverFiguraConTeclado(key) {
             break;
     }
     figuraSeleccionada.ajustarPosicionFigura(figuraSeleccionada);
+    guardarEstado();
     dibujarFiguras();
+    cambiosRealizados = true; // Indicar que se han realizado cambios
+    reiniciarBtn.disabled = false; // Habilitar el botón de reinicio
 }
+
 
 function deseleccionarFiguras() {
     figuras.forEach(figura => figura.seleccionada = false);

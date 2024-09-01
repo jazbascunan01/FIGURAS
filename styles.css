@@ -40,7 +40,7 @@ h1{
     box-shadow: 5px 5px 15px rgb(0 0 0);
     transition: background-color 1s cubic-bezier(0.42, 0, 0.58, 1), color 0.5s cubic-bezier(0.42, 0, 0.58, 1);
 }
-#regenerarFiguras:hover, #deshacer:hover, #rehacer:hover, #reiniciar:hover{
+#regenerarFiguras:hover, #deshacer:hover, #rehacer:hover, #reiniciar:hover, #descargarImagen:hover{
     background-color: #322e4b;
     box-shadow: 5px 5px 15px rgb(28, 31, 89);
     cursor: pointer;
@@ -52,7 +52,7 @@ button img {
     object-fit: cover; /* Para que la imagen cubra el área del botón */
 }
 
-#deshacer, #rehacer, #reiniciar{
+#deshacer, #rehacer, #reiniciar, #descargarImagen{
     width:50px;
     background-color: #122c66;
     color: white;
@@ -71,4 +71,21 @@ button img {
 }
 button:hover {
     transform: scale(1.1);
+}
+button:disabled {
+    background-color: grey;
+    color: #cccccc;
+    cursor: not-allowed; /* Cambia el cursor a uno que indique que no es interactivo */
+    box-shadow: none; /* Quita el sombreado para hacer más evidente que están deshabilitados */
+}
+
+button:disabled img {
+    opacity: 0.5; /* Hace que la imagen dentro del botón sea más transparente cuando está deshabilitado */
+    cursor: no-drop;
+}
+button:disabled:hover {
+    transform: none; /* No se aplica la transformación de escala */
+    transition: none;
+    cursor: no-drop !important;
+    box-shadow: 5px 5px 15px rgb(0 0 0) !important;
 }
