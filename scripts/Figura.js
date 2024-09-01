@@ -34,4 +34,7 @@ class Figura {
             seleccionada: this.seleccionada
         };
     }
+    ajustarEscala() {
+        this.escala = this.seleccionada ? 1.2 : 1; // Agranda la figura un 10% si está seleccionada
+    }
 }

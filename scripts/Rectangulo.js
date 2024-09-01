@@ -28,28 +28,38 @@ class Rectangulo extends Figura {
         return x >= this.x && x <= this.x + this.ancho && y >= this.y && y <= this.y + this.alto;
     }
 
+
     dibujar(ctx) {
         if (!isFinite(this.x) || !isFinite(this.y) || !isFinite(this.ancho) || !isFinite(this.alto)) {
             console.error("Valores no finitos para el gradiente:", this.x, this.y, this.ancho, this.alto);
             return;
         }
 
-        const imageData = ctx.createImageData(this.ancho, this.alto);
-        for (let y = 0; y < this.alto; y++) {
-            for (let x = 0; x < this.ancho; x++) {
-                const ratio = x / this.ancho;
-                const r = Math.round(this.colorInicio.r * (1 - ratio) + this.colorFin.r * ratio);
-                const g = Math.round(this.colorInicio.g * (1 - ratio) + this.colorFin.g * ratio);
-                const b = Math.round(this.colorInicio.b * (1 - ratio) + this.colorFin.b * ratio);
+        const escala = this.seleccionada ? 1.2 : 1;
+        const anchoEscalado = this.ancho * escala;
+        const altoEscalado = this.alto * escala;
+
+        // Crear el degradado
+        const imageData = ctx.createImageData(anchoEscalado, altoEscalado);
+        for (let y = 0; y < altoEscalado; y++) {
+            for (let x = 0; x < anchoEscalado; x++) {
+                const ratioX = x / anchoEscalado;
+                const ratioY = y / altoEscalado;
+                const r = Math.round(this.colorInicio.r * (1 - ratioX) + this.colorFin.r * ratioX);
+                const g = Math.round(this.colorInicio.g * (1 - ratioX) + this.colorFin.g * ratioX);
+                const b = Math.round(this.colorInicio.b * (1 - ratioX) + this.colorFin.b * ratioX);
                 this.setPixel(imageData, x, y, r, g, b);
             }
         }
-        ctx.putImageData(imageData, this.x, this.y);
+        
+        // Ajustar la posición considerando la escala
+        ctx.putImageData(imageData, this.x - (anchoEscalado - this.ancho) / 2, this.y - (altoEscalado - this.alto) / 2);
 
+        // Dibujar el borde si está seleccionado
         if (this.seleccionada) {
             ctx.strokeStyle = 'white';
             ctx.lineWidth = 2;
-            ctx.strokeRect(this.x, this.y, this.ancho, this.alto);
+            ctx.strokeRect(this.x - (anchoEscalado - this.ancho) / 2, this.y - (altoEscalado - this.alto) / 2, anchoEscalado, altoEscalado);
         }
     }
 
