@@ -7,7 +7,7 @@ La aplicación se basa en un lienzo HTML donde puedes interactuar con diversas f
 - **Lienzo de Dibujo**: Área principal donde se muestran y manipulan las figuras.
 - **Botones**:
   - **Regenerar Figuras**: Crea nuevas figuras en el lienzo y limpia el historial de deshacer/rehacer.
-  - **Deshacer**: Revierte la última acción realizada en el lienzo. Este botón se activa después de realizar cambios y se desactiva si no hay acciones para deshacer.
+  - ![Descripción de la imagen](images/boton.png)**Deshacer**: Revierte la última acción realizada en el lienzo. Este botón se activa después de realizar cambios y se desactiva si no hay acciones para deshacer.
   - **Rehacer**: Rehace una acción previamente deshecha. Este botón se activa después de deshacer una acción y se desactiva si no hay acciones para rehacer.
   - **Reiniciar**: Restaura el estado inicial del lienzo y limpia el historial de deshacer/rehacer. Este botón solo está disponible si se han realizado cambios en el lienzo.
   - **Descargar Imagen**: Permite descargar una captura del lienzo como una imagen PNG.
