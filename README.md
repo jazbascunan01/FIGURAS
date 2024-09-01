@@ -43,7 +43,9 @@ La interfaz incluye los siguientes elementos:
 
 ### Detalles Adicionales
 
-- **Color de los Cuadrados**: El color de los cuadrados es el complementario al promedio de los colores de los círculos actuales.
+- **Color de los Cuadrados**: El color de cada cuadrado es complementario al color de un circulo.
+- **Color de los Circulos**: El color de los circulos se genera aleatoriamente.
+- **Color de los Rectángulos**: El color de los rectangulos en un gradiente entre dos colores generados aleatoriamente.
 - **Movimiento con el Teclado**: Las figuras se moverán más allá de los límites del lienzo y aparecerán del lado opuesto cuando se utilicen las teclas de flecha.
 - **Detalles del Cursor**:
   - <img src="images/image9.png" width="20"/> **Pointer**: - Cuando el cursor pasa por encima de un botón, se transforma en una mano para indicar que es clickeable.
