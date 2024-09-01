@@ -2,7 +2,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: max-content;
     margin: 0;
     background-image: url('images/fondo-lineas-dinamicas-estilo-papel_23-2149008629.avif');
     background-repeat: no-repeat;
@@ -40,12 +40,10 @@ h1{
     box-shadow: 5px 5px 15px rgb(0 0 0);
     transition: background-color 1s cubic-bezier(0.42, 0, 0.58, 1), color 0.5s cubic-bezier(0.42, 0, 0.58, 1);
 }
-#regenerarFiguras:hover{
+#regenerarFiguras:hover, #deshacer:hover, #rehacer:hover, #reiniciar:hover{
     background-color: #322e4b;
     box-shadow: 5px 5px 15px rgb(28, 31, 89);
     cursor: pointer;
-    width:200px;
-    height: 60px;
     font-size: large;
 }
 button img {
@@ -54,8 +52,8 @@ button img {
     object-fit: cover; /* Para que la imagen cubra el área del botón */
 }
 
-#deshacer, #rehacer{
-    width:5%;
+#deshacer, #rehacer, #reiniciar{
+    width:50px;
     background-color: #122c66;
     color: white;
     margin: 0.5%;
@@ -70,4 +68,7 @@ button img {
     align-items: center;
     justify-content: center;
     margin: 1%;
+}
+button:hover {
+    transform: scale(1.1);
 }
