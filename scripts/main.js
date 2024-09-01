@@ -486,6 +486,7 @@ function regenerarFiguras() {
         actualizarEstadoBotones();
     }, cantFiguras * delayIncrement);
     cambiosRealizados = false;
+    reiniciarBtn.disabled = true;
 }
 
 
