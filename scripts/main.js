@@ -7,21 +7,24 @@ const regenerarBtn = document.getElementById('regenerarFiguras');
 const deshacerBtn = document.getElementById('deshacer');
 const rehacerBtn = document.getElementById('rehacer');
 const cantFiguras = 5;
-const delayIncrement = 200; // Tiempo de retraso entre dibujos
-const velocidadMovimiento = 5; // Velocidad normal
-const velocidadMovimientoRapida = 20; // Velocidad rápida para deshacer/rehacer
+const delayIncrement = 200;
+const velocidadMovimiento = 5;
+const velocidadMovimientoRapida = 20; 
 const reiniciarBtn = document.getElementById('reiniciar');
 
 let figuras = [];
 let historialEstados = [];
 let indiceHistorial = -1;
-let coloresCirculos = []; // Array para almacenar colores de los círculos
-let coloresComplementariosUsados = new Set(); // Set para colores complementarios usados
+let coloresCirculos = [];
+let coloresComplementariosUsados = new Set();
 
 let figuraSeleccionada = null;
 let offsetX, offsetY;
 let isDragging = false;
-let movimientoRapido = false; // Controlar si el movimiento es rápido
+let movimientoRapido = false;
+
+let estadoInicial = null;
+let cambiosRealizados = false;
 
 // Funciones Auxiliares
 function generarColorAleatorio() {
@@ -81,8 +84,8 @@ const crearFiguraFuncs = [
         const lado = Math.random() * 40 + 25;
         const x = Math.random() * (canvas.width - lado);
         const y = Math.random() * (canvas.height - lado);
-        const width = lado * 2;  // Asegúrate de definir width correctamente
-        const height = lado;     // Asegúrate de definir height correctamente
+        const width = lado * 2;
+        const height = lado;
 
         return new Rectangulo(x, y, width, height, generarColorAleatorio(), ctx, false);
     }
@@ -97,7 +100,9 @@ function crearFiguras(figuraIndex, cantidad) {
     }
 }
 
-// Funciones de Dibujo
+/* *
+    Funciones de Dibujo 
+                        */
 function dibujarFigurasConDelay() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     figuras.forEach((figura, index) => {
@@ -137,12 +142,16 @@ function handleCanvasMouseDown(event) {
     const { x, y } = getCanvasCoordinates(event);
     deseleccionarFiguras();
     seleccionarFigura(x, y);
+    if (figuraSeleccionada) {
+        canvas.style.cursor = 'move'; // Cambia el cursor a "move" cuando seleccionas una figura
+    }
 }
 
 function handleCanvasMouseMove(event) {
     if (figuraSeleccionada && isDragging) {
         const { x, y } = getCanvasCoordinates(event);
         moverFigura(x, y);
+        canvas.style.cursor = 'move';
     }
 }
 
@@ -151,6 +160,7 @@ function handleCanvasMouseUp() {
     isDragging = false;
     guardarEstado(); // Guardar estado después de mover la figura
     dibujarFiguras();
+    canvas.style.cursor = 'default';
 }
 
 function handleDocumentKeyDown(event) {
@@ -162,6 +172,7 @@ function handleDocumentKeyDown(event) {
         moverFiguraConTeclado(event.key);
         guardarEstado(); // Guardar estado después de mover con teclado
     }
+
 }
 function actualizarEstadoBotones() {
     deshacerBtn.disabled = indiceHistorial <= 0;
@@ -180,8 +191,7 @@ function guardarEstado() {
     actualizarEstadoBotones(); // Actualizar el estado de los botones después de guardar
 }
 
-let estadoInicial = null;
-let cambiosRealizados = false;
+
 
 // Función para guardar el estado inicial
 function guardarEstadoInicial() {
@@ -250,6 +260,9 @@ function deshacer() {
         }
         dibujarFiguras(); // Redibujar para reflejar la selección
         actualizarEstadoBotones(); 
+        if (indiceHistorial === 0) {
+            reiniciarBtn.disabled = true;
+        }
     }
 }
 
@@ -275,8 +288,13 @@ function rehacer() {
         }
         dibujarFiguras(); // Redibujar para reflejar la selección
         actualizarEstadoBotones(); 
+
+        // Habilitar el botón de "Reiniciar" si se han realizado cambios
+        reiniciarBtn.disabled = false;
+        cambiosRealizados = true;
     }
 }
+
 
 function reconstruirFigura(figuraData) {
     let figura;
@@ -433,3 +451,19 @@ function crearFigurasIniciales() {
 
 // Inicializar la aplicación
 main();
+canvas.addEventListener('mouseleave', handleCanvasMouseLeave);
+
+function handleCanvasMouseLeave() {
+    if (isDragging) {
+        // Suelta la figura si se está arrastrando cuando el cursor sale del canvas
+        isDragging = false;
+
+        // Mantén la figura seleccionada
+        if (figuraSeleccionada) {
+            figuraSeleccionada.seleccionada = true;
+        }
+
+        guardarEstado(); // Guardar el estado al soltar la figura
+        dibujarFiguras(); // Redibuja para reflejar la selección
+    }
+}
