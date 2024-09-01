@@ -42,10 +42,10 @@ La interfaz incluye los siguientes elementos:
 - **Color de los Cuadrados**: El color de los cuadrados es el complementario al promedio de los colores de los círculos actuales.
 - **Movimiento con el Teclado**: Las figuras se moverán más allá de los límites del lienzo y aparecerán del lado opuesto cuando se utilicen las teclas de flecha.
 - **Detalles del Cursor**:
-  - **Manito (Pointer)**: 🖱️ - Cuando el cursor pasa por encima de un botón, se transforma en una mano para indicar que es clickeable.
-  - **Flechita (Arrow)**: ⬅️ - El cursor se muestra como una flecha estándar cuando está en reposo.
-  - **Not-Allowed (Prohibido)**: 🚫 - Los botones bloqueados muestran un cursor en forma de "prohibido" para indicar que no están disponibles.
-  - **Move (Mover)**: ↔️ - Cuando se arrastra una figura, el cursor cambia a una flecha con cuatro direcciones para indicar que se está moviendo.
+  - <img src="images/image9.png" width="20"/> **Pointer**: - Cuando el cursor pasa por encima de un botón, se transforma en una mano para indicar que es clickeable.
+  - <img src="images/image11.png" width="20"/> **Defaut**: - El cursor se muestra como una flecha estándar cuando está en reposo.
+  - <img src="images/image12.png" width="20"/> **Not-Allowed**: - Los botones bloqueados muestran un cursor en forma de "prohibido" para indicar que no están disponibles.
+  - <img src="images/image10.png" width="20"/> **Move**: - Cuando se arrastra una figura, el cursor cambia a una flecha con cuatro direcciones para indicar que se está moviendo.
 
 ### Recursos Utilizados
 
